@@ -29,10 +29,10 @@
 #include <cmath>
 
 #define USE_FILES
-#define CAN_CHECK
+//#define CAN_CHECK
 
 #ifdef USE_FILES
-#define TASK "../tests/01"
+#define TASK "../tests/51"
 #endif
 
 #ifdef CAN_CHECK
@@ -56,28 +56,34 @@
  *
  *      number of unique prime numbers is equal
  *
+ * 3) Theorem : Number of prime numbers below a given number
  *
+ *  The prime counting function π(n) is defined as the number of primes not greater than n.
+ *
+ *  π(n) ~= n/ln(n)
+ *
+ *  π(11) = 5  <-> 2,3,5,7,11
  *
  */
 
-const int PRIME_MAX = 100000;
+const int K_LIMIT = 620421;
+const int PRIME_MAX = 10000000;
 const int PRIME_MAX2 = PRIME_MAX * PRIME_MAX;
 
 void generatePrimes(std::vector<int> * storage)
 {
     std::vector<bool> sieve(PRIME_MAX2, true);
 
-    for (int value=2; value<PRIME_MAX; value++)
+    for (unsigned int value=2; value<PRIME_MAX; value++)
     {
         if (sieve[value])
         {
             storage->push_back(value);
-            for (int j=value*value; j<PRIME_MAX; j+=value)
+            for (unsigned int j=value*value; j<PRIME_MAX; j+=value)
             {
                 sieve[j] = false;
             }
         }
-
     }
 }
 
@@ -97,38 +103,55 @@ int main(int argc, char** argv)
     int K, N;
     std::cin >> K >> N;
 
+    // Condition : max of primes should not be larger than 1e7
+    if (K > K_LIMIT)
+    {
+        std::cout << -1;
+        return 0;
+    }
+
 
     // 1st condition:
     if (K > N*N)
+    {
+        std::cout << -1;
         return -1;
-
-
-
-//    std::vector< std::vector<int> > matrix(N);
-//    for (int i=0;i<N;i++)
-//    {
-//        matrix[i].resize(N);
-//    }
+    }
 
     std::vector<int> primes;
     generatePrimes(&primes);
 
-    int value = 0;
-    int count = 0;
-    for (int i=0;i<N;i++)
+
+    if (K == N*N)
     {
-
-        for (int j=0;j<N;j++)
+        for (unsigned int i=0;i<N;i++)
         {
-            if (i==0)
+            for (unsigned int j=0;j<N;j++)
             {
-                value = primes[count];
+                std::cout << primes[i*N + j] << " ";
             }
-
-            std::cout << value << " ";
-            count++;
+            std::cout << std::endl;
         }
-        std::cout << std::endl;
+    }
+    else
+    {
+        // K < N*N :
+        std::vector< int > line(N,-1);
+        for (int i=0;i<N;i++)
+        {
+            int index = i % K;
+            line[i] = primes[index];
+        }
+
+        for (unsigned int i=0;i<N;i++)
+        {
+            for (unsigned int j=0;j<N;j++)
+            {
+                int index = (j + i) % K;
+                std::cout << line[index] << " ";
+            }
+            std::cout << std::endl;
+        }
     }
 
 
